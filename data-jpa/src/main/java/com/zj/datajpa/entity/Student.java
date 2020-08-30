@@ -40,7 +40,7 @@ public class Student {
 
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JoinTable(name = "teacher_student", joinColumns = { @JoinColumn(name = "student_id") }, inverseJoinColumns = {@JoinColumn(name = "teacher_id") })
+    @JoinTable(name = "zj_teacher_student", joinColumns = { @JoinColumn(name = "student_id") }, inverseJoinColumns = {@JoinColumn(name = "teacher_id") })
     private List<Teacher> teachers;
 }
 

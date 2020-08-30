@@ -43,7 +43,7 @@ none | 啥都不做（默认值）
 
 
 # 3.Entity
-##3.1 @Id 主键
+## 3.1 @Id 主键
 下面为两个主键的策略示例，前者使用uuid，后者使用自增
 ```
     @Id
@@ -68,7 +68,7 @@ none | 啥都不做（默认值）
 注意，可以看到上面示例中```@GenericGenerator```定义了一个name值，这里随意定义，
 然后```@GeneratorValue```接受这个值去找到指定的策略。
 
-##3.2 @Column 常规字段
+## 3.2 @Column 常规字段
 
 - ```name``` : 可选，表示数据库表中列的名称。
 - ```nullable``` : 可选，表示该字段是否允许为 null，默认为 true(null)。若设置为false 则该列不可为null值
@@ -141,6 +141,31 @@ tips:在```@JoinColumn```中，name与referencedColumnName名称不应当相同�
 Tips: @JoinColumn可以不写，这样jpa会默认生成一个中间表去保存这两张表之间的关联关系，其命名规则为```表A_表B```不过对于一对多、多对一来说，没必要。 
 
 
+## 3.5 @ManyToMany(多对多)
+
+以下为学生和老师表之间的多对多关系的示例：
+这是学生表中
+
+```
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "teacher_student", joinColumns = { @JoinColumn(name = "student_id") }, inverseJoinColumns = {@JoinColumn(name = "teacher_id") })
+    private List<Teacher> teachers;
+```
+
+这是老师表
+```
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "zj_teacher_student", joinColumns = { @JoinColumn(name = "teacher_id") }, inverseJoinColumns = {@JoinColumn(name = "student_id") })
+    private List<Student> students;
+```
+
+当然，我们可以不加```@JoinTable```,这样系统会自动生成一个诸如```teache_student```这样的表来，但是不便于规范化，所以使用这样的中间表。  
+在```@JoinTable```有三个参数：  
+- ```name``` : 选填，中间表名称，如果不填，那么会默认生成```表A_表B```这样格式的名称
+- ```joinColumns``` : 选填，与当前表关联的表的字段
+- ```joinColumns``` : 选填，当前表所属的字段
+
+对于```joinColumns``` 和```joinColumns```，具体参考上方示例即可。
 
         
 

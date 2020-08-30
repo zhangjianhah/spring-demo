@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
-import com.zj.dataredis.util.MyMessageListener;
+import com.zj.dataredis.service.MessageListenerService;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -119,7 +119,7 @@ public class RedisConfig {
 
 
     @Bean
-    public MessageListenerAdapter listenerAdapter(MyMessageListener receiver) {
+    public MessageListenerAdapter listenerAdapter(MessageListenerService receiver) {
         return new MessageListenerAdapter(receiver);
     }
 

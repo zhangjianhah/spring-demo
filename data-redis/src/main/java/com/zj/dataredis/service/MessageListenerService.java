@@ -1,4 +1,5 @@
-package com.zj.dataredis.util;
+package com.zj.dataredis.service;
+
 
 import com.zj.dataredis.entity.Student;
 import lombok.extern.slf4j.Slf4j;
@@ -9,15 +10,27 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import io.lettuce.core.pubsub.RedisPubSubListener;
+/**
+ * 这是一个基于PUB/SUB机制的消息队列
+ * 实现方式为：
+ * 1.在配置项配置订阅监听的频道
+ * 2.实现MessageListener接口，重写onMessage()方法
+ * 3.通过convertAndSend()向指定频道发送信息
+ * 这样redis收到消息后，会通知监听的频道
+ *
+ */
 
 @Component
 @Slf4j
-public class MyMessageListener implements MessageListener {
-
+public class MessageListenerService  implements MessageListener {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    /**
+     *
+     * @param message sub收到的消息，其中包含channel和消息内容
+     * @param pattern 其实就是sub收到的通信频道，这里点重复了都
+     */
     @Override
     public void onMessage(Message message, byte[] pattern) {
         log.info(message.toString());

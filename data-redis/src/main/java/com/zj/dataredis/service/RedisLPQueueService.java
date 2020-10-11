@@ -44,6 +44,7 @@ public class RedisLPQueueService {
                     //项目启动的时候，吧执行队列中的所有元素移入待执行队列以期望重新执行
                     List<Object> list = redisTemplate.boundListOps(GlobalData.getEmailQuequExecute()).range(0,-1);
                     redisTemplate.boundListOps(GlobalData.getEmailQueueWait()).leftPushAll(list);
+                    redisTemplate.delete(GlobalData.getEmailQuequExecute());
 
                     redisQueueListern();
                 } catch (Exception e) {

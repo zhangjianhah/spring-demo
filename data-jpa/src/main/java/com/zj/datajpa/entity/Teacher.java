@@ -21,4 +21,8 @@ public class Teacher {
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "zj_teacher_student", joinColumns = { @JoinColumn(name = "teacher_id") }, inverseJoinColumns = {@JoinColumn(name = "student_id") })
     private List<Student> students;
+
+
+    @Column
+    private Short status;
 }

@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="data-redis" />
+        <module name="shell-demo" />
         <module name="data-jpa" />
       </profile>
     </annotationProcessing>
@@ -19,6 +20,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="data-jpa" options="-parameters" />
       <module name="data-redis" options="-parameters" />
+      <module name="shell-demo" options="-parameters" />
     </option>
   </component>
 </project>

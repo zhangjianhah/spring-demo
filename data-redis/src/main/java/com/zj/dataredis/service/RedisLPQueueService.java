@@ -43,7 +43,12 @@ public class RedisLPQueueService {
 
                     //项目启动的时候，吧执行队列中的所有元素移入待执行队列以期望重新执行
                     List<Object> list = redisTemplate.boundListOps(GlobalData.getEmailQuequExecute()).range(0,-1);
-                    redisTemplate.boundListOps(GlobalData.getEmailQueueWait()).leftPushAll(list);
+//                    redisTemplate.boundListOps(GlobalData.getEmailQueueWait()).leftPushAll(list);
+                    if(list != null && list.size() > 0){
+                        list.stream().forEach(object->{
+                            redisTemplate.boundListOps(GlobalData.getEmailQueueWait()).leftPush(object);
+                        });
+                    }
                     redisTemplate.delete(GlobalData.getEmailQuequExecute());
 
                     redisQueueListern();
@@ -83,7 +88,7 @@ public class RedisLPQueueService {
                     log.error("执行失败"+result);
                     e.printStackTrace();
                 }
-                redisTemplate.boundListOps(GlobalData.getEmailQueueWait()).remove(0,result);
+                redisTemplate.boundListOps(GlobalData.getEmailQuequExecute()).remove(0,result);
                 log.info("工作执行完毕");
             }
         }

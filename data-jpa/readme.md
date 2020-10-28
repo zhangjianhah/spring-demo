@@ -167,8 +167,200 @@ Tips: @JoinColumn可以不写，这样jpa会默认生成一个中间表去保存
 
 对于```joinColumns``` 和```joinColumns```，具体参考上方示例即可。
 
-        
+​        
 
+
+# 4.Dao
+一般来说，只需要新建**接口**继承```JpaRepository```或者```JpaSpecificationExecutor```即可。这两者有些许不同之处，
+
+```JpaRepository``` :  常规的库接口，已经实现了一些基础的功能，包括正删改查等。有些地方会使用```CrudRepository```这个接口，但是其实```JpaRepository```已经继承了后者，所以直接用```JpaRepository```即可。
+
+```JpaSpecificationExecutor```: 提供了一些拓展功能，完成多条件查询，并且支持分页与排序。但是不能单独使用，需要配合其他接口使用，如JpaRepository.
+
+
+
+
+
+## JpaRepository
+
+JpaRepository有一些已经默认给出的方法，其中唯一一个需要注意的是
+
+```
+//查询所有的list，其中的参数是用于指定排序方式
+List<T> findAll(Sort sort);
+//示例,因为Sort的构造函数已经转为私有，所以不在能直接new来构造
+teacherRepository.findAll(Sort.by(Sort.Direction.DESC, "teacherId","teacherName"));
+
+
+//对于save()方法，如果entity中已经给了主键值，那么在保存之前会先查询该主键的记录是否存在。
+
+```
+
+此外，JPA提供了根据pojo对象来新建接口方法，可以达到写SQL查询的目的。例如以下，首先是一个pojo类
+
+```java
+public class Teacher {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private Long teacherId;
+
+    @Column
+    private String teacherName;
+
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "zj_teacher_student", joinColumns = { @JoinColumn(name = "teacher_id") }, inverseJoinColumns = {@JoinColumn(name = "student_id") })
+    private List<Student> students;
+
+
+    @Column
+    private Short status;
+}
+```
+
+我们可以直接按照规则写方法名，而不必自己手动实现，其自动实现内部构造。
+
+```
+@Repository
+public interface TeacherRepository extends JpaRepository<Teacher,Long>, JpaSpecificationExecutor<Teacher> {
+
+
+    /**
+     * 根据教师名称查询单个教师，这是单个，注意方法中teacher和teachers的区别
+     * 这里find|get|read都一样
+     * @param name
+     * @return
+     */
+    Teacher findTeacherByTeacherName(String name);
+    Teacher readTeacherByTeacherName(String name);
+    Teacher getTeacherByTeacherName(String name);
+
+    /**
+     * 根据教师名称和状态码查询单个教师
+     * @param name
+     * @param status
+     * @return
+     */
+    Teacher findTeacherByTeacherNameAndStatus(String name,Short status);
+
+    /**
+     * 根据教师状态查询教师列表
+     * @param status
+     * @return
+     */
+    List<Teacher> findTeachersByStatus(Short status);
+
+    /**
+     * 根据教师状态查询教师，并且按照教师ID排序，默认正序（即ASC）
+     * @param status
+     * @return
+     */
+    List<Teacher> findTeachersByStatusOrderByTeacherId(Short status);
+
+    /**
+     * 根据教师状态查询教师，并且按照教师ID倒序排序
+     * @param status
+     * @return
+     */
+    List<Teacher> findTeachersByStatusOrderByTeacherIdDesc(Short status);
+
+    /**
+     * 根据教师状态查询教师，并且教师状态码小于指定参数
+     * @param status
+     * @return
+     */
+    List<Teacher> findTeachersByStatusLessThan(Short status);
+
+    /**
+     * 根据教师名称和状态码查询教师列表，其中教师名称为模糊查询、
+     * 需要注意的是，这里需要自己给参数添加运算符%，例如
+     * findTeachersByTeacherNameLikeAndStatus("%zhang%",0)
+     * @param teacherName
+     * @param status
+     * @return
+     */
+    List<Teacher> findTeachersByTeacherNameLikeAndStatus(String teacherName,Short status);
+
+
+    /**
+     * 根据教师状态查询，这里采用了参数排序，而不是利用方法名称规则
+     * @param status
+     * @param sort
+     * @return
+     */
+    List<Teacher> findTeachersByStatusLessThan(Short status,Sort sort);
+
+
+    @Override
+    Page<Teacher> findAll(Pageable pageable);
+
+
+    /**
+     * 使用sql查询获取教师信息，这里采用HQL，如果想要使用原生SQL，那么@Query中nativeQuery设置为true
+     * 这里的占位符用的是?+参数下标
+     * 注意：：参数下标从1开始
+     * @param status
+     * @param name
+     * @return
+     */
+    @Query(value="from Teacher teacher where teacher.status = ?1 and teacher.teacherName like  concat('%',?2,'%') ")
+    List<Teacher> listTeacherBystatusAndName1(Short status,String name);
+    /**
+     * z这里与方法一中基本一致，采用了:+自定义参数名称的方式，与MyBatis类似
+     * @param status
+     * @param name
+     * @return
+     */
+    @Query(value="from Teacher teacher where teacher.status = :status and teacher.teacherName like  concat('%',:name,'%') ")
+    List<Teacher> listTeacherBystatusAndName2(@Param("status") Short status, @Param("name") String name);
+
+
+    /**
+     * 使用原生SQL获取教师名称，其实就是nativeQuery = true,默认值为false
+     * @param status
+     * @return
+     */
+    @Query(value="select teacher_name from teacher where status = ?1",nativeQuery = true)
+    String listNameByStatus(Short status);
+}
+
+```
+
+
+
+
+
+
+
+## JpaSpecificationExecutor
+
+//TODO 这玩意比较复杂，下次再看
+
+
+
+
+
+
+
+# 5.事务
+
+- UPDATE或者DELETE操作需要使用事务，此时需要定义Service层，在Service层的方法上添加```@Transactional```注解实现事务操作。
+- 在@Query注解中，编写JPQL实现DELETE和UPDATE操作的时候，必须加上@modifying注解，以通知Spring Data 这是一个DELETE或UPDATE操作。
+- @Query中不支持insert
+
+
+
+
+
+
+```
+@Modifying
+@Query(value="update teacher set teacher_name = ?1 where teacher_id = ?2",nativeQuery = true)
+void updaetTeacher(String name,Long id);
+```
+
+# 6.批量插入/修改
 
 
 

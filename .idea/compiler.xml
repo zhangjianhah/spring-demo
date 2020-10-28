@@ -8,12 +8,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="data-redis" />
-        <module name="shell-demo" />
         <module name="data-jpa" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="data-redis-demo" target="1.5" />
+      <module name="shell-demo" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

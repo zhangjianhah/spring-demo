@@ -7,7 +7,6 @@
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/data-redis/pom.xml" />
         <option value="$PROJECT_DIR$/data-jpa/pom.xml" />
-        <option value="$PROJECT_DIR$/shell-demo/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

@@ -6,9 +6,11 @@ import com.zj.datajpa.dao.TeacherRepository;
 import com.zj.datajpa.entity.School;
 import com.zj.datajpa.entity.Student;
 import com.zj.datajpa.entity.Teacher;
+import com.zj.datajpa.service.DemoService;
 import com.zj.datajpa.service.TeacherService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @Slf4j
@@ -42,6 +48,30 @@ public class TestController {
         teacher.setStatus((short)0);
 
         teacherRepository.save(teacher);
+
+    }
+
+
+    @GetMapping(value = "/saveAsync")
+    public void saveAsync() throws ExecutionException, InterruptedException {
+
+        Teacher teacher = new Teacher();;
+        teacher.setTeacherName(UUID.randomUUID().toString().replaceAll("-",""));
+        teacher.setStatus((short)0);
+
+
+
+
+
+
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                teacherRepository.save(teacher);
+            }
+        }).start();
 
     }
 
@@ -102,6 +132,29 @@ public class TestController {
 //        }
 //        return list;
 //    }
+
+
+    @Autowired
+    private ApplicationContext appContext;
+    @Autowired
+    private DemoService demoService;
+
+    @GetMapping(value = "/zhangjian")
+    public void te(){
+//        String[] beans = appContext.getBeanDefinitionNames();
+//
+//        Arrays.sort(beans);
+//
+//        for (String bean : beans)
+//
+//        {
+//
+//            System.out.println(bean + " of Type :: " + appContext.getBean(bean).getClass());
+//
+//        }
+
+        demoService.test();
+    }
 
 
 

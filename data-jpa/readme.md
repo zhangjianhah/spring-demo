@@ -333,12 +333,18 @@ public interface TeacherRepository extends JpaRepository<Teacher,Long>, JpaSpeci
 
 
 
+
 ## JpaSpecificationExecutor
 
 //TODO 这玩意比较复杂，下次再看
 
 
-
+## 分页
+jpa提供了一个分页方式``Page<T>``，具体使用方法为。前两个参数为当前页（从0开始）、每页数量。第三个参数非必填，主要是排序所用的参数
+```java
+ PageRequest pageable = PageRequest.of(currentPage - 1, size);
+ Page<Video> videoPage = videoRepository.findAll(pageable);
+```
 
 
 

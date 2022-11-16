@@ -18,5 +18,4 @@ public class StudentCard {
     @Column
     private String studentCardNumber;
 
-
 }
